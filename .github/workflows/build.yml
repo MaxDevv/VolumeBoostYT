@@ -62,5 +62,7 @@ jobs:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: VolumeBoostYT ${{ steps.tag.outputs.version }}
           files: output/*
+          make_latest: true
+          fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
