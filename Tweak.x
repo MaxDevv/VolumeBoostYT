@@ -94,14 +94,8 @@ static float GetCustomVolumeMultiplier() {
 }
 
 static float GetLogarithmicAudioMultiplier() {
-  float m = GetCustomVolumeMultiplier();
-  if (m <= 1.0f) {
-    return m;
-  }
-  // m goes from 1.0 to 20.0 in the UI (2000%).
-  // We map this linearly to an exponent to achieve 200.0x physical amplitude
-  // max. powf(200.0f, (m - 1.0f) / 19.0f) ensures m=20 gives 200^1 = 200x.
-  return powf(200.0f, (m - 1.0f) / 19.0f);
+  // Now linear for granular control (0.0 to 2.0)
+  return GetCustomVolumeMultiplier();
 }
 
 static void NotifyVolumeChange() {
@@ -117,8 +111,8 @@ static void NotifyVolumeChange() {
 static void SetCustomVolumeMultiplier(float multiplier) {
   if (multiplier < 0.0f)
     multiplier = 0.0f;
-  if (multiplier > 20.0f)
-    multiplier = 20.0f;
+  if (multiplier > 2.0f)
+    multiplier = 2.0f;
 
 #if ENABLE_VOLUME_PERSISTENCE
   [[NSUserDefaults standardUserDefaults]
@@ -273,14 +267,14 @@ static CGPoint initialTouchPoint;
       CGFloat translationY = location.y - initialTouchPoint.y;
 
       // Sweeping vertically up (negative Y) increases volume
-      // A full 570-point swipe upward reaches the 20x multiplier
-      float deltaMultiplier = -translationY / 30.0f;
+      // A full 600-point swipe upward spans the 0.0 to 2.0 multiplier range (200%)
+      float deltaMultiplier = -translationY / 300.0f;
       float newMultiplier = gestureStartMultiplier + deltaMultiplier;
 
       if (newMultiplier < 0.0f)
         newMultiplier = 0.0f;
-      if (newMultiplier > 20.0f)
-        newMultiplier = 20.0f;
+      if (newMultiplier > 2.0f)
+        newMultiplier = 2.0f;
 
       SetCustomVolumeMultiplier(newMultiplier);
       [[YTVolumeHUD sharedHUD] showWithValue:newMultiplier];
@@ -382,8 +376,8 @@ static CGPoint initialTouchPoint;
       [self valueForKey:@"_settingsViewControllerDelegate"];
 
   YTSettingsSectionItem *enableTweak = [YTSettingsSectionItemClass
-          switchItemWithTitle:@"Enable VolumeBoostYT"
-             titleDescription:@"Allow custom right-edge pan volume gesture"
+          switchItemWithTitle:@"Granular Volume Control"
+             titleDescription:@"Allows precise 0-200% volume via right-edge gesture"
       accessibilityIdentifier:nil
                      switchOn:IsVolumeBoostYTEnabled()
                   switchBlock:^BOOL(YTSettingsCell *cell, BOOL enabled) {
@@ -409,7 +403,7 @@ static CGPoint initialTouchPoint;
                forCategory:title:icon:titleDescription:headerHidden:)]) {
     [settingsViewController setSectionItems:sectionItems
                                 forCategory:TweakSection
-                                      title:@"VolumeBoostYT"
+                                      title:@"Granular Volume"
                                        icon:nil
                            titleDescription:nil
                                headerHidden:NO];
@@ -419,7 +413,7 @@ static CGPoint initialTouchPoint;
                       forCategory:title:titleDescription:headerHidden:)]) {
     [settingsViewController setSectionItems:sectionItems
                                 forCategory:TweakSection
-                                      title:@"VolumeBoostYT"
+                                      title:@"Granular Volume"
                            titleDescription:nil
                                headerHidden:NO];
   }

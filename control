@@ -1,8 +1,8 @@
 Package: com.vasirakcalgux.volumeboostyt
-Name: VolumeBoostYT
-Version: 1.0.2
+Name: GranularVolumeYT
+Version: 1.1.0
 Architecture: iphoneos-arm64
-Description: An awesome MobileSubstrate tweak!
+Description: Precise granular volume control (0-200%) for YouTube.
 Maintainer: vasirakcalgux
 Author: vasirakcalgux
 Section: Tweaks
